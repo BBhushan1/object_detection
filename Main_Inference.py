@@ -27,7 +27,6 @@ except Exception as e:
     print(f"Error loading YOLO model: {e}")
     exit()
 
-# Tried to implemented a image classifier in between inference although the model is still need to be fine-tunned
 model_path = r'D:\CogniAble\Object_Tracking\models\ModelE.h5' 
 if not os.path.exists(model_path):
     print(f"Model file not found: {model_path}")
@@ -52,13 +51,11 @@ reid_model = load_reid_model()
 print("ReID model loaded successfully.")
 
 def preprocess_for_classification(cropped_image):
-    """Preprocess the image before classification."""
     resized_image = cv2.resize(cropped_image, (256, 256))  
     normalized_image = resized_image / 255.0  
     return np.expand_dims(normalized_image, axis=0)  
 
 def classify_person(cropped_image):
-    """Classify if the person is a child or an adult."""
     preprocessed_image = preprocess_for_classification(cropped_image)
     predictions = classification_model.predict(preprocessed_image)
     
@@ -69,13 +66,12 @@ def classify_person(cropped_image):
         probability = predictions[0][0]  
         print(f"Predicted probability: {probability}")
         
-        threshold = 0.6
+        threshold = 0.5
         return "Child" if probability > threshold else "Therapist"
     else:
         raise ValueError("Unexpected prediction shape.")
 
 def filter_duplicate_ids(boxes, track_ids, distance_threshold=50):
-    """Filter out duplicate IDs based on distance between object centers."""
     filtered_ids = []
     filtered_boxes = []
 
@@ -97,7 +93,6 @@ def filter_duplicate_ids(boxes, track_ids, distance_threshold=50):
     return filtered_boxes, filtered_ids
 
 def extract_features(image, model):
-    """Extract features from the image using the ReID model."""
     image = cv2.resize(image, (256, 256))  
     image = np.transpose(image, (2, 0, 1))  
     image = torch.tensor(image).float().unsqueeze(0)  
@@ -108,7 +103,6 @@ def extract_features(image, model):
 
 
 def match_track_by_features(new_features, track_features, threshold=0.5):
-    """Match a new set of features with the existing track features based on cosine similarity."""
     for track_id, features in track_features.items():
         similarity = cosine_similarity(new_features.numpy(), features.numpy())
         if similarity >= threshold:  
@@ -116,7 +110,6 @@ def match_track_by_features(new_features, track_features, threshold=0.5):
     return None
 
 def process_video(input_video_path, output_video_path):
-    """Process a single video file and save the output."""
     cap = cv2.VideoCapture(input_video_path)
     frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
