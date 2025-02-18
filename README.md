@@ -1,4 +1,4 @@
-Pipeline for Person Detection, Classification, and Tracking
+Pipeline for Person Detection and Tracking
 
 1. Imports and Setup
 •	Purpose: Initialize the environment by importing the necessary libraries for deep learning, object detection, classification, and tracking.
